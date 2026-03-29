@@ -88,3 +88,9 @@ production:
   primary:
     <<: *default
     url: <%= ENV["DATABASE_URL"] %>
+  # solid_cache is bundled in Ruby 3.4 and connects_to :cache at load time.
+  # Point it to the primary DB so boot succeeds (cache_store: :memory_store
+  # means this table is never actually written to).
+  cache:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
