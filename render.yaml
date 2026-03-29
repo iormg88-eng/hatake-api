@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: hatake-api
+    env: ruby
+    plan: free
+    buildCommand: bundle install && bundle exec rails db:migrate
+    startCommand: bundle exec puma -C config/puma.rb
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hatake-db
+          property: connectionString
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: DEVISE_JWT_SECRET_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: RAILS_LOG_TO_STDOUT
+        value: "true"
+
+databases:
+  - name: hatake-db
+    plan: free
