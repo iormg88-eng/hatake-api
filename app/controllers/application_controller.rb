@@ -35,20 +35,9 @@ class ApplicationController < ActionController::API
 
   def photo_urls_for(log)
     return [] unless log.photos.attached?
-    log.photos.filter_map do |p|
+    log.photos.map do |p|
       blob = p.blob
-      next nil unless blob.service_name == "amazon"
-      begin
-        blob.service.url(
-          blob.key,
-          expires_in: 1.hour,
-          filename: blob.filename,
-          content_type: blob.content_type,
-          disposition: "inline"
-        )
-      rescue StandardError
-        nil
-      end
+      "https://#{ENV['AWS_BUCKET']}.s3.#{ENV.fetch('AWS_REGION', 'ap-northeast-1')}.amazonaws.com/#{blob.key}"
     end
   end
 
