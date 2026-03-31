@@ -37,7 +37,7 @@ class ApplicationController < ActionController::API
     return [] unless log.photos.attached?
     log.photos.map do |p|
       blob = p.blob
-      "https://#{ENV['AWS_BUCKET']}.s3.#{ENV.fetch('AWS_REGION', 'ap-northeast-1')}.amazonaws.com/#{blob.key}"
+      "https://hatake-field-photos.s3.ap-northeast-1.amazonaws.com/#{blob.key}"
     end
   end
 
