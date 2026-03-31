@@ -13,7 +13,15 @@ class Api::V1::FieldLogsController < ApplicationController
   def create
     log = @field.field_logs.build(log_params.merge(user: current_user))
 
-    if log.save
+    begin
+      log.save
+    rescue StandardError => e
+      # after_commit コールバック（S3 analyze job）で例外が発生しても、
+      # レコードが保存済みであれば成功として扱う
+      raise e unless log.persisted?
+    end
+
+    if log.persisted?
       render json: { field_log: log_json(log, include_photos: false) }, status: :created
     else
       render json: { errors: log.errors.full_messages }, status: :unprocessable_entity
