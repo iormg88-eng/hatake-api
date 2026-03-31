@@ -16,7 +16,7 @@ class Api::V1::GroupsController < ApplicationController
       { id: gm.user.id, name: gm.user.name, email: gm.user.email, role: gm.role }
     end
 
-    fields = @group.fields.includes(field_logs: :user).map do |field|
+    fields = @group.fields.includes(field_logs: [:user, { photos_attachments: :blob }]).map do |field|
       latest = field.field_logs.order(created_at: :desc).first
       field_json(field, latest)
     end
@@ -61,7 +61,10 @@ class Api::V1::GroupsController < ApplicationController
         tags: latest_log.tags,
         memo: latest_log.memo,
         updated_at: latest_log.created_at,
-        updated_by: latest_log.user.name
+        updated_by: latest_log.user.name,
+        photo_urls: latest_log.photos.attached? ? latest_log.photos.filter_map { |p|
+          p.blob.url(expires_in: 1.hour) rescue nil
+        } : []
       } : nil
     }
   end

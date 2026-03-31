@@ -6,7 +6,7 @@ require "active_model/railtie"
 require "active_job/railtie"
 require "active_record/railtie"
 require "action_controller/railtie"
-# require "active_storage/engine"   # not used in this API
+require "active_storage/engine"
 # require "action_mailer/railtie"   # not used in this API
 # require "action_mailbox/engine"   # not used in this API
 # require "action_text/engine"      # not used in this API

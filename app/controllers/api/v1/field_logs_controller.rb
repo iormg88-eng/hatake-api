@@ -34,7 +34,7 @@ class Api::V1::FieldLogsController < ApplicationController
   end
 
   def log_params
-    params.require(:field_log).permit(:status, :memo, tags: [])
+    params.require(:field_log).permit(:status, :memo, :field_id, tags: [], photos: [])
   end
 
   def log_json(log)
@@ -44,7 +44,10 @@ class Api::V1::FieldLogsController < ApplicationController
       tags: log.tags,
       memo: log.memo,
       created_at: log.created_at,
-      user: { id: log.user.id, name: log.user.name }
+      user: { id: log.user.id, name: log.user.name },
+      photo_urls: log.photos.attached? ? log.photos.filter_map { |p|
+        p.blob.url(expires_in: 1.hour) rescue nil
+      } : []
     }
   end
 end

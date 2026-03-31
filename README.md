@@ -36,3 +36,16 @@ rails s -p 3001
 - JWT認証はJTIマッチャーでトークン無効化を実装
 - 無料プランの圃場10件制限をAPIレベルで制御
 - field_logsを積み上げ式にすることで更新履歴が自動的に生育ログとして機能
+- 写真はAWS S3（Active Storage）に保存。最大3枚まで添付可能
+
+## Renderデプロイ時の環境変数
+Renderのダッシュボード（Environment → Environment Variables）に以下を追加してください：
+
+| 変数名 | 説明 |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | AWSアクセスキーID |
+| `AWS_SECRET_ACCESS_KEY` | AWSシークレットアクセスキー |
+| `AWS_REGION` | `ap-northeast-1` |
+| `AWS_BUCKET` | `hatake-field-photos` |
+
+また、デプロイ時に `rails db:migrate` が実行されるため、Active Storageのマイグレーション（`create_active_storage_tables`）も自動で適用されます。
