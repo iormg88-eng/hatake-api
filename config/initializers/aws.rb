@@ -1,3 +1,5 @@
+require "aws-sdk-s3"
+
 Aws.config.update(
   region: ENV.fetch("AWS_REGION", "ap-northeast-1"),
   credentials: Aws::Credentials.new(
