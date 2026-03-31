@@ -7,14 +7,14 @@ class Api::V1::FieldLogsController < ApplicationController
                  .order(created_at: :desc)
                  .limit(20)
 
-    render json: { field_logs: logs.map { |log| log_json(log) } }
+    render json: { field_logs: logs.map { |log| log_json(log, include_photos: true) } }
   end
 
   def create
     log = @field.field_logs.build(log_params.merge(user: current_user))
 
     if log.save
-      render json: { field_log: log_json(log) }, status: :created
+      render json: { field_log: log_json(log, include_photos: false) }, status: :created
     else
       render json: { errors: log.errors.full_messages }, status: :unprocessable_entity
     end
@@ -37,7 +37,7 @@ class Api::V1::FieldLogsController < ApplicationController
     params.require(:field_log).permit(:status, :memo, :field_id, tags: [], photos: [])
   end
 
-  def log_json(log)
+  def log_json(log, include_photos: true)
     {
       id: log.id,
       status: log.status,
@@ -45,7 +45,7 @@ class Api::V1::FieldLogsController < ApplicationController
       memo: log.memo,
       created_at: log.created_at,
       user: { id: log.user.id, name: log.user.name },
-      photo_urls: photo_urls_for(log)
+      photo_urls: include_photos ? photo_urls_for(log) : []
     }
   end
 
