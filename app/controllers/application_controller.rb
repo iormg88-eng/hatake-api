@@ -39,9 +39,8 @@ class ApplicationController < ActionController::API
       blob = p.blob
       next nil unless blob.service_name == "amazon"
       begin
-        s3_resource = blob.service.instance_variable_get(:@client)
-        presigner = Aws::S3::Presigner.new(client: s3_resource.client)
-        presigner.presigned_url(:get_object, bucket: "hatake-field-photos", key: blob.key, expires_in: 3600)
+        s3_bucket = blob.service.instance_variable_get(:@bucket)
+        s3_bucket.object(blob.key).presigned_url(:get, expires_in: 3600)
       rescue => e
         Rails.logger.error "[photo_urls_for] #{e.class}: #{e.message}"
         nil
