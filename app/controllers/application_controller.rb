@@ -35,21 +35,16 @@ class ApplicationController < ActionController::API
 
   def photo_urls_for(log)
     return [] unless log.photos.attached?
-    s3 = Aws::S3::Presigner.new(
-      client: Aws::S3::Client.new(
-        region: "ap-northeast-1",
-        access_key_id: ENV["AWS_ACCESS_KEY_ID"],
-        secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"]
-      )
-    )
     log.photos.filter_map do |p|
       blob = p.blob
       next nil unless blob.service_name == "amazon"
-      begin
-        s3.presigned_url(:get_object, bucket: "hatake-field-photos", key: blob.key, expires_in: 3600)
-      rescue StandardError
-        nil
-      end
+      blob.service.url(
+        blob.key,
+        expires_in: 3600,
+        filename: blob.filename,
+        content_type: blob.content_type,
+        disposition: "inline"
+      )
     end
   end
 
