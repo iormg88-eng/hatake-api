@@ -38,13 +38,18 @@ class ApplicationController < ActionController::API
     log.photos.filter_map do |p|
       blob = p.blob
       next nil unless blob.service_name == "amazon"
-      blob.service.url(
-        blob.key,
-        expires_in: 3600,
-        filename: blob.filename,
-        content_type: blob.content_type,
-        disposition: "inline"
-      )
+      begin
+        blob.service.url(
+          blob.key,
+          expires_in: 3600,
+          filename: blob.filename,
+          content_type: blob.content_type,
+          disposition: "inline"
+        )
+      rescue => e
+        Rails.logger.error "[photo_urls_for] #{e.class}: #{e.message}"
+        nil
+      end
     end
   end
 
