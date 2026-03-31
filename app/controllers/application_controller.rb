@@ -39,10 +39,18 @@ class ApplicationController < ActionController::API
       blob = p.blob
       next nil unless blob.service_name == "amazon"
       begin
-        s3_bucket = blob.service.instance_variable_get(:@bucket)
-        s3_bucket.object(blob.key).presigned_url(:get, expires_in: 3600)
+        service = blob.service
+        Rails.logger.info "[photo_urls_for] service=#{service.class}"
+        Rails.logger.info "[photo_urls_for] AWS_KEY present=#{ENV['AWS_ACCESS_KEY_ID'].present?} length=#{ENV['AWS_ACCESS_KEY_ID']&.length}"
+        bucket = service.respond_to?(:bucket) ? service.bucket : service.instance_variable_get(:@bucket)
+        Rails.logger.info "[photo_urls_for] bucket=#{bucket.class} nil=#{bucket.nil?}"
+        client = bucket.client
+        Rails.logger.info "[photo_urls_for] client credentials class=#{client.config.credentials.class}"
+        presigner = Aws::S3::Presigner.new(client: client)
+        presigner.presigned_url(:get_object, bucket: "hatake-field-photos", key: blob.key, expires_in: 3600)
       rescue => e
         Rails.logger.error "[photo_urls_for] #{e.class}: #{e.message}"
+        Rails.logger.error "[photo_urls_for] backtrace: #{e.backtrace.first(3).join(' | ')}"
         nil
       end
     end
