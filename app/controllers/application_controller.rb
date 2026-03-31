@@ -39,13 +39,8 @@ class ApplicationController < ActionController::API
       blob = p.blob
       next nil unless blob.service_name == "amazon"
       begin
-        blob.service.url(
-          blob.key,
-          expires_in: 3600,
-          filename: blob.filename,
-          content_type: blob.content_type,
-          disposition: "inline"
-        )
+        s3_resource = blob.service.instance_variable_get(:@client)
+        s3_resource.bucket("hatake-field-photos").object(blob.key).presigned_url(:get, expires_in: 3600)
       rescue => e
         Rails.logger.error "[photo_urls_for] #{e.class}: #{e.message}"
         nil
