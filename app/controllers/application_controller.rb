@@ -33,6 +33,17 @@ class ApplicationController < ActionController::API
     render json: { errors: [ "このグループへのアクセス権がありません" ] }, status: :forbidden
   end
 
+  def photo_urls_for(log)
+    return [] unless log.photos.attached?
+    log.photos.filter_map do |p|
+      begin
+        p.blob.url(expires_in: 1.hour)
+      rescue StandardError
+        nil
+      end
+    end
+  end
+
   def find_member_group!
     @group = Group.find(params[:group_id] || params[:id])
     @membership = @group.group_members.find_by(user: current_user)

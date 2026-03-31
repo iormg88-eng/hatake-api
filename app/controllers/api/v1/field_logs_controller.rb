@@ -45,9 +45,8 @@ class Api::V1::FieldLogsController < ApplicationController
       memo: log.memo,
       created_at: log.created_at,
       user: { id: log.user.id, name: log.user.name },
-      photo_urls: log.photos.attached? ? log.photos.filter_map { |p|
-        p.blob.url(expires_in: 1.hour) rescue nil
-      } : []
+      photo_urls: photo_urls_for(log)
     }
   end
+
 end

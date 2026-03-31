@@ -62,9 +62,7 @@ class Api::V1::GroupsController < ApplicationController
         memo: latest_log.memo,
         updated_at: latest_log.created_at,
         updated_by: latest_log.user.name,
-        photo_urls: latest_log.photos.attached? ? latest_log.photos.filter_map { |p|
-          p.blob.url(expires_in: 1.hour) rescue nil
-        } : []
+        photo_urls: photo_urls_for(latest_log)
       } : nil
     }
   end
