@@ -29,6 +29,7 @@ class Api::V1::SessionsController < ApplicationController
   end
 
   def user_json(user)
-    { id: user.id, name: user.name, email: user.email }
+    group_id = user.group_members.first&.group_id
+    { id: user.id, name: user.name, email: user.email, group_id: group_id }
   end
 end
