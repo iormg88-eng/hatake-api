@@ -10,14 +10,21 @@ Rails.application.routes.draw do
 
       get "me", to: "users#me"
 
-      resources :groups, only: [ :create, :show ] do
+      resources :groups, only: [ :create, :show, :update ] do
+        collection do
+          get :mine
+        end
         member do
           post :join
+          delete :leave
         end
         resources :fields, only: [ :index, :create, :update, :destroy ]
       end
 
       resources :field_logs, only: [ :index, :create ]
+
+      post "subscriptions/create_checkout", to: "subscriptions#create_checkout"
+      post "webhooks/stripe", to: "webhooks#stripe"
     end
   end
 

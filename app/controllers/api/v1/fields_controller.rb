@@ -13,7 +13,7 @@ class Api::V1::FieldsController < ApplicationController
   end
 
   def create
-    if @group.fields.count >= FREE_PLAN_LIMIT
+    if current_user.plan == "free" && @group.fields.count >= FREE_PLAN_LIMIT
       return render json: { errors: [ "無料プランでは圃場を#{FREE_PLAN_LIMIT}件まで登録できます" ] },
                     status: :unprocessable_entity
     end
