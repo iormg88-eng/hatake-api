@@ -15,18 +15,18 @@ class Api::V1::WebhooksController < ApplicationController
     case event["type"]
     when "checkout.session.completed"
       session = event["data"]["object"]
-      user_id = session.dig("metadata", "user_id")
+      user_id = session.metadata.user_id
       user = User.find_by(id: user_id)
       if user
         user.update!(
           plan: "pro",
-          stripe_customer_id: session["customer"],
-          stripe_subscription_id: session["subscription"]
+          stripe_customer_id: session.customer,
+          stripe_subscription_id: session.subscription
         )
       end
     when "customer.subscription.deleted"
       subscription = event["data"]["object"]
-      user = User.find_by(stripe_subscription_id: subscription["id"])
+      user = User.find_by(stripe_subscription_id: subscription.id)
       user&.update!(plan: "free", stripe_subscription_id: nil)
     end
 
